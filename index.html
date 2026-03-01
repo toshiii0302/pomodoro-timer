@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Pomodoro Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffcfe4 0%, #a6c1ee 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff6b8b;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #5a67d8;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .progress-ring {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 100%;
+            border: 10px solid #e2e8f0;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .progress-fill {
+            width: 100%;
+            height: 100%;
+            border: 10px solid #c44863;
+            border-radius: 50%;
+            position: absolute;
+            clip: rect(0px, 100px, 200px, 0px);
+            transform: rotate(0deg);
+            transition: all 1s linear;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(145deg, #ff6b8b, #ff8fa3);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 139, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .settings {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .music-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .music-btn {
+            background: linear-gradient(145deg, #5a67d8, #7c8de8);
+            padding: 12px 25px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 16px;
+            background: white;
+            margin-bottom: 15px;
+        }
+
+        .mode-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .mode-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6b8b;
+        }
+
+        .mode-dot.break {
+            background: #5a67d8;
+        }
+
+        /* Add cute decorative elements */
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .decoration-1 {
+            top: 20px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            /* Replace with cute star icon PNG */
+            background: url('deco 3.png') no-repeat center center;
+            background-size: contain;
+        }
+
+        .decoration-2 {
+            bottom: 30px;
+            left: 30px;
+            width: 70px;
+            height: 60px;
+            /* Replace with cute heart icon PNG */
+            background: url('deco 3.png') no-repeat center center;
+            background-size: contain;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .timer-display {
+                font-size: 3rem;
+            }
+            
+            .progress-ring {
+                width: 150px;
+                height: 150px;
+            }
+            
+            button {
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <div class="container">
+        <h1>🌸 Cute Pomodoro Timer 🌸</h1>
+        
+        <div class="mode-indicator">
+            <div class="mode-dot" id="modeDot"></div>
+            <span id="modeText">Work Time</span>
+        </div>
+
+        <div class="progress-ring">
+            <div class="progress-bg"></div>
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="timer-display" id="timer">25:00</div>
+
+        <div class="controls">
+            <button id="startBtn">Start</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+
+        <div class="settings">
+            <div class="setting-group">
+                <label for="workDuration">Work Duration (minutes)</label>
+                <input type="number" id="workDuration" min="1" max="60" value="25">
+            </div>
+            <div class="setting-group">
+                <label for="breakDuration">Break Duration (minutes)</label>
+                <input type="number" id="breakDuration" min="1" max="30" value="5">
+            </div>
+        </div>
+
+        <div class="music-section">
+            <label for="musicSelect">Calming Background Music</label>
+            <select id="musicSelect">
+                <option value="none">No Music</option>
+                <option value="rain">Gentle Rain</option>
+                <option value="forest">Forest Sounds</option>
+                <option value="ocean">Ocean Waves</option>
+                <option value="piano">Soft Piano</option>
+            </select>
+            
+            <div class="music-controls">
+                <button class="music-btn" id="playMusicBtn">Play Music</button>
+                <button class="music-btn" id="stopMusicBtn">Stop Music</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <!-- User needs to add their music files -->
+        <!-- Example: <source src="rain.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <script>
+        class PomodoroTimer {
+            constructor() {
+                this.workDuration = 25 * 60; // 25 minutes in seconds
+                this.breakDuration = 5 * 60; // 5 minutes in seconds
+                this.timeLeft = this.workDuration;
+                this.isRunning = false;
+                this.isWorkTime = true;
+                this.timerInterval = null;
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.updateDisplay();
+            }
+
+            initializeElements() {
+                this.timerDisplay = document.getElementById('timer');
+                this.progressFill = document.getElementById('progressFill');
+                this.modeDot = document.getElementById('modeDot');
+                this.modeText = document.getElementById('modeText');
+                
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                
+                this.workDurationInput = document.getElementById('workDuration');
+                this.breakDurationInput = document.getElementById('breakDuration');
+                
+                this.musicSelect = document.getElementById('musicSelect');
+                this.playMusicBtn = document.getElementById('playMusicBtn');
+                this.stopMusicBtn = document.getElementById('stopMusicBtn');
+                this.backgroundMusic = document.getElementById('backgroundMusic');
+            }
+
+            setupEventListeners() {
+                this.startBtn.addEventListener('click', () => this.start());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                this.workDurationInput.addEventListener('change', (e) => {
+                    this.workDuration = parseInt(e.target.value) * 60;
+                    if (this.isWorkTime && !this.isRunning) {
+                        this.timeLeft = this.workDuration;
+                        this.updateDisplay();
+                    }
+                });
+                
+                this.breakDurationInput.addEventListener('change', (e) => {
+                    this.breakDuration = parseInt(e.target.value) * 60;
+                    if (!this.isWorkTime && !this.isRunning) {
+                        this.timeLeft = this.breakDuration;
+                        this.updateDisplay();
+                    }
+                });
+                
+                this.playMusicBtn.addEventListener('click', () => this.playMusic());
+                this.stopMusicBtn.addEventListener('click', () => this.stopMusic());
+                this.musicSelect.addEventListener('change', () => this.changeMusic());
+            }
+
+            start() {
+                if (!this.isRunning) {
+                    this.isRunning = true;
+                    this.startBtn.disabled = true;
+                    this.pauseBtn.disabled = false;
+                    
+                    this.timerInterval = setInterval(() => {
+                        this.timeLeft--;
+                        this.updateDisplay();
+                        
+                        if (this.timeLeft <= 0) {
+                            this.switchMode();
+                        }
+                    }, 1000);
+                }
+            }
+
+            pause() {
+                if (this.isRunning) {
+                    this.isRunning = false;
+                    this.startBtn.disabled = false;
+                    this.pauseBtn.disabled = true;
+                    clearInterval(this.timerInterval);
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.isWorkTime = true;
+                this.timeLeft = this.workDuration;
+                this.updateDisplay();
+                this.updateModeIndicator();
+            }
+
+            switchMode() {
+                this.isWorkTime = !this.isWorkTime;
+                this.timeLeft = this.isWorkTime ? this.workDuration : this.breakDuration;
+                this.updateModeIndicator();
+                
+                // Play a cute notification sound (optional)
+                this.playNotification();
+            }
+
+            updateDisplay() {
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = this.timeLeft % 60;
+                this.timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Update progress ring
+                const totalTime = this.isWorkTime ? this.workDuration : this.breakDuration;
+                const progress = ((totalTime - this.timeLeft) / totalTime) * 360;
+                this.progressFill.style.transform = `rotate(${progress}deg)`;
+            }
+
+            updateModeIndicator() {
+                if (this.isWorkTime) {
+                    this.modeDot.classList.remove('break');
+                    this.modeText.textContent = 'Work Time';
+                } else {
+                    this.modeDot.classList.add('break');
+                    this.modeText.textContent = 'Break Time';
+                }
+            }
+
+            playMusic() {
+                const selectedMusic = this.musicSelect.value;
+                if (selectedMusic !== 'none') {
+                    // User needs to add their music files with these names:
+                    // rain.mp3, forest.mp3, ocean.mp3, piano.mp3
+                    this.backgroundMusic.src = `${selectedMusic}.mp3`;
+                    this.backgroundMusic.play().catch(e => {
+                        console.log('Please add music files to enable background music');
+                    });
+                }
+            }
+
+            stopMusic() {
+                this.backgroundMusic.pause();
+            }
+
+            changeMusic() {
+                if (!this.backgroundMusic.paused) {
+                    this.stopMusic();
+                    this.playMusic();
+                }
+            }
+
+            playNotification() {
+                // Simple notification sound using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                    
+                    const gainNode = audioContext.createGain();
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {
+                    console.log('Notification sound not supported');
+                }
+            }
+        }
+
+        // Initialize the timer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PomodoroTimer();
+        });
+    </script>
+</body>
+</html>
